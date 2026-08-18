@@ -1,0 +1,4 @@
+
+== onecx-human-task-ui
+
+include::onecx-human-task-ui-docs.adoc[opts=optional]

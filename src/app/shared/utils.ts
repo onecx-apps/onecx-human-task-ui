@@ -1,0 +1,3 @@
+// This object encapsulates functions because ...
+//  ...Jasmine has problems to spying direct imported functions
+export const Utils = {}

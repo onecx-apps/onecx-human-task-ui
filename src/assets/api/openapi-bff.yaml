@@ -1,0 +1,335 @@
+openapi: 3.0.3
+info:
+  title: onecx-human-task-bff internal service
+  description: Backend-For-Frontend (BFF) API for onecx-human-task. Provides endpoints for the Angular frontend to search tasks, view task details, and perform accept/decline actions.
+  version: 1.0.0
+
+servers:
+  - url: "http://onecx-human-task-bff:8080"
+
+tags:
+  - name: tasksInternal
+    description: Managing human tasks
+
+paths:
+  /tasks/search:
+    post:
+      x-onecx:
+        permissions:
+          task:
+            - read
+      tags:
+        - tasksInternal
+      description: Search for tasks by search criteria
+      operationId: searchTasksByCriteria
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TaskSearchCriteria'
+      responses:
+        200:
+          description: Task search results retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TaskPageResult'
+        400:
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetailResponse'
+
+  /tasks/{id}:
+    get:
+      x-onecx:
+        permissions:
+          task:
+            - read
+      tags:
+        - tasksInternal
+      description: Get a task by its id
+      operationId: getTaskById
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: Task retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetTaskResponse'
+        404:
+          description: Task not found
+    delete:
+      x-onecx:
+        permissions:
+          task:
+            - delete
+      tags:
+        - tasksInternal
+      description: Delete a task by its id
+      operationId: deleteTaskById
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        204:
+          description: Task deleted successfully
+        404:
+          description: Task not found
+
+  /tasks/{id}/accept:
+    post:
+      x-onecx:
+        permissions:
+          task:
+            - write
+      tags:
+        - tasksInternal
+      description: Accept a task with optional custom input forwarded to the provider
+      operationId: acceptTask
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AcceptTaskRequest'
+      responses:
+        204:
+          description: Task accepted successfully
+        400:
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetailResponse'
+        404:
+          description: Task not found or already completed or modificationCount mismatch
+
+  /tasks/{id}/decline:
+    post:
+      x-onecx:
+        permissions:
+          task:
+            - write
+      tags:
+        - tasksInternal
+      description: Decline a task with optional custom input forwarded to the provider
+      operationId: declineTask
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DeclineTaskRequest'
+      responses:
+        204:
+          description: Task declined successfully
+        400:
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetailResponse'
+        404:
+          description: Task not found or already completed or modificationCount mismatch
+
+components:
+  schemas:
+    TaskSearchCriteria:
+      type: object
+      properties:
+        title:
+          type: string
+          description: Filter tasks by title
+        providerTaskId:
+          type: string
+          description: Filter tasks by provider task ID
+        statuses:
+          type: array
+          items:
+            $ref: '#/components/schemas/TaskStatus'
+          description: Filter tasks by one or more statuses
+        providerType:
+          allOf:
+            - $ref: '#/components/schemas/ProviderType'
+          description: Provider type, eg. CAMUNDA, N8N, etc.
+        pageNumber:
+          format: int32
+          description: The number of page.
+          default: 0
+          type: integer
+        pageSize:
+          format: int32
+          description: The size of page
+          default: 100
+          maximum: 1000
+          type: integer
+
+    TaskPageResult:
+      type: object
+      properties:
+        totalElements:
+          format: int64
+          description: The total elements in the resource.
+          type: integer
+        number:
+          format: int32
+          type: integer
+        size:
+          format: int32
+          type: integer
+        totalPages:
+          format: int64
+          type: integer
+        stream:
+          type: array
+          items:
+            $ref: '#/components/schemas/Task'
+
+    Task:
+      type: object
+      properties:
+        modificationCount:
+          format: int32
+          type: integer
+        creationDate:
+          $ref: '#/components/schemas/OffsetDateTime'
+        creationUser:
+          type: string
+        modificationDate:
+          $ref: '#/components/schemas/OffsetDateTime'
+        modificationUser:
+          type: string
+        id:
+          type: string
+        title:
+          type: string
+        description:
+          type: string
+        status:
+          $ref: '#/components/schemas/TaskStatus'
+        providerType:
+          $ref: '#/components/schemas/ProviderType'
+        providerTaskId:
+          type: string
+          description: The task ID in the external provider system
+        providerURL:
+          type: string
+          description: URL of the specific provider instance
+        customInput:
+          type: object
+          additionalProperties:
+            type: string
+          description: Arbitrary key-value pairs provided by users during accept/decline
+
+    GetTaskResponse:
+      required:
+        - resource
+      type: object
+      properties:
+        resource:
+          $ref: '#/components/schemas/Task'
+
+    AcceptTaskRequest:
+      required:
+        - modificationCount
+      type: object
+      properties:
+        modificationCount:
+          format: int32
+          type: integer
+          description: The modificationCount from the last GET request, used for optimistic locking
+        input:
+          type: object
+          additionalProperties:
+            type: string
+          description: Arbitrary key-value pairs forwarded to the provider as custom input
+
+    DeclineTaskRequest:
+      required:
+        - modificationCount
+      type: object
+      properties:
+        modificationCount:
+          format: int32
+          type: integer
+          description: The modificationCount from the last GET request, used for optimistic locking
+        input:
+          type: object
+          additionalProperties:
+            type: string
+          description: Arbitrary key-value pairs forwarded to the provider as custom input
+
+    TaskStatus:
+      type: string
+      enum:
+        - CREATED
+        - ACCEPTED
+        - DECLINED
+        - ABORTED
+
+    ProviderType:
+      type: string
+      enum:
+        - CAMUNDA
+        - N8N
+
+    OffsetDateTime:
+      format: date-time
+      type: string
+      example: 2022-03-10T12:15:50-04:00
+
+    ProblemDetailResponse:
+      type: object
+      properties:
+        errorCode:
+          type: string
+        detail:
+          type: string
+        params:
+          type: array
+          items:
+            $ref: '#/components/schemas/ProblemDetailParam'
+        invalidParams:
+          type: array
+          items:
+            $ref: '#/components/schemas/ProblemDetailInvalidParam'
+
+    ProblemDetailParam:
+      type: object
+      properties:
+        key:
+          type: string
+        value:
+          type: string
+
+    ProblemDetailInvalidParam:
+      type: object
+      properties:
+        name:
+          type: string
+        message:
+          type: string

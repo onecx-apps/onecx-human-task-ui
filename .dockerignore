@@ -1,0 +1,41 @@
+# Copy of .gitignore AND removed "dist" directory
+
+# compiled output
+# dist
+tmp
+out-tsc
+reports
+
+# dependencies
+node_modules
+
+# profiling files
+chrome-profiler-events*.json
+speed-measure-plugin*.json
+
+# IDEs and editors
+.idea
+.project
+.classpath
+.c9
+.settings
+.history
+.vscode
+*.launch
+*.sublime-workspace
+
+# misc
+.angular
+.eslintcache
+.sass-cache
+.husky/_
+.gitlab*
+.scannerwork
+connect.lock
+typings
+*.log
+*.sh
+
+# System Files
+.DS_Store
+Thumbs.db

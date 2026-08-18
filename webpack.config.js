@@ -1,0 +1,81 @@
+const { ModifyEntryPlugin } = require('@angular-architects/module-federation/src/utils/modify-entry-plugin')
+const { share, withModuleFederationPlugin } = require('@angular-architects/module-federation/webpack')
+const { ModifySourcePlugin, ReplaceOperation } = require('modify-source-webpack-plugin')
+
+const config = withModuleFederationPlugin({
+  name: 'onecx-human-task-ui',
+  filename: 'remoteEntry.js',
+  exposes: {
+    './OneCXHumanTaskModule': 'src/main.ts'
+  },
+  shared: share({
+    '@angular/core': { requiredVersion: 'auto', includeSecondaries: true },
+    '@angular/common': { requiredVersion: 'auto', includeSecondaries: { skip: ['@angular/common/http/testing'] } },
+    '@angular/common/http': { requiredVersion: 'auto', includeSecondaries: true },
+    '@angular/forms': { requiredVersion: 'auto', includeSecondaries: true },
+    '@angular/platform-browser': { requiredVersion: 'auto', includeSecondaries: true },
+    '@angular/router': { requiredVersion: 'auto', includeSecondaries: true },
+    '@ngx-translate/core': { requiredVersion: 'auto' },
+    primeng: { requiredVersion: 'auto', includeSecondaries: true },
+    rxjs: { requiredVersion: 'auto', includeSecondaries: true },
+    '@onecx/accelerator': { requiredVersion: 'auto', includeSecondaries: true },
+    '@onecx/angular-accelerator': { requiredVersion: 'auto', includeSecondaries: true },
+    '@onecx/angular-auth': { requiredVersion: 'auto', includeSecondaries: true },
+    '@onecx/angular-integration-interface': { requiredVersion: 'auto', includeSecondaries: true },
+    '@onecx/angular-remote-components': { requiredVersion: 'auto', includeSecondaries: true },
+    '@onecx/angular-testing': { requiredVersion: 'auto', includeSecondaries: true },
+    '@onecx/angular-utils': { requiredVersion: 'auto', includeSecondaries: true },
+    '@onecx/angular-webcomponents': { requiredVersion: 'auto', includeSecondaries: true },
+    '@onecx/angular-standalone-shell': { requiredVersion: 'auto', includeSecondaries: true },
+    '@onecx/integration-interface': { requiredVersion: 'auto', includeSecondaries: true }
+  })
+})
+config.devServer = { allowedHosts: 'all' }
+
+const plugins = config.plugins.filter((plugin) => !(plugin instanceof ModifyEntryPlugin))
+
+const modifyPrimeNgPlugin = new ModifySourcePlugin({
+  rules: [
+    {
+      test: (module) => {
+        return module.resource && module.resource.includes('primeng')
+      },
+      operations: [
+        new ReplaceOperation(
+          'all',
+          'document\\.createElement\\(([^)]+)\\)',
+          'document.createElementFromPrimeNg({"this": this, "arguments": Array.from(arguments), element: $1})'
+        ),
+        new ReplaceOperation('all', 'Theme.setLoadedStyleName', '(function(_){})')
+      ]
+    }
+  ]
+})
+
+const modifyMaterialPlugin = new ModifySourcePlugin({
+  rules: [
+    {
+      test: (module) => {
+        return (
+          module.resource && (module.resource.includes('@angular/material') || module.resource.includes('@angular/cdk'))
+        )
+      },
+      operations: [
+        new ReplaceOperation(
+          'all',
+          'document\\.createElement\\(',
+          'document.createElementFromMaterial({"this": this, "arguments": Array.from(arguments)},'
+        )
+      ]
+    }
+  ]
+})
+
+module.exports = {
+  ...config,
+  plugins: [...plugins, modifyPrimeNgPlugin, modifyMaterialPlugin],
+  module: { parser: { javascript: { importMeta: false } } },
+  output: { uniqueName: 'onecx-human-task-ui', publicPath: 'auto' },
+  experiments: { ...config.experiments, topLevelAwait: true },
+  optimization: { runtimeChunk: false, splitChunks: false }
+}

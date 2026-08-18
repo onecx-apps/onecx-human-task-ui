@@ -1,0 +1,43 @@
+app:
+  name: ui
+  image:
+    repository: 'onecx/onecx-human-task-ui'
+  routing:
+    enabled: true
+    path: /mfe/human-task/
+
+  operator:
+    # Microfrontend
+    microfrontend:
+      enabled: true
+      specs:
+        main:
+          exposedModule: "./OneCXHumanTaskModule"
+          description: "OneCX Human Task UI"
+          note: "OneCX Human Task UI auto import via operator"
+          type: MODULE
+          technology: WEBCOMPONENTMODULE
+          remoteName: onecx-human-task
+          tagName: ocx-human-task-component
+    # Microservice
+    microservice:
+      spec:
+        name: OneCX Human Task UI
+        description: OneCX Human Task Frontend
+    # Slot
+    slot:
+      enabled: true
+      specs:
+        onecx-product-data:
+          name: 'onecx-product-data'
+          description: 'Getting base data of all products provided by product store'
+    # Permission
+    permission:
+      enabled: true
+      spec:
+        permissions:
+          TASK:
+            CREATE: Create task
+            DELETE: Delete task
+            EDIT: Edit task
+            SEARCH: Search task
