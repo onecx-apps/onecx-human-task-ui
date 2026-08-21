@@ -1,0 +1,8 @@
+@use '/src/app/hm-mixins.scss' as *;
+
+@include dialog-footer-buttons;
+@include dialog-non-full-size-modal;
+@include ocx-text-responsive;
+@include ocx-required-label;
+@include correct-autocomplete;
+@include autocomplete-zebra-rows;

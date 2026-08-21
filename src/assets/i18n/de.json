@@ -1,0 +1,102 @@
+{
+  "PAGE_TASK_SEARCH": "Aufgabensuche",
+  "ACTIONS": {
+    "LABEL": "Aktionen",
+    "TOOLTIP": "Aktionen für die Daten der Tabellenzeile",
+    "DELETE": {
+      "LABEL": "Löschen",
+      "HEADER": "Aufgabe löschen",
+      "TEXT": "Möchten Sie die Aufgabe mit dieser Provider-Aufgaben-ID löschen?",
+      "NO_UNDO": "Diese Aktion kann nicht rückgängig gemacht werden!",
+      "MESSAGE": {
+        "OK": "Die Aufgabe wurde erfolgreich gelöscht",
+        "NOK": "Ein Fehler ist aufgetreten. Die Aufgabe wurde nicht gelöscht."
+      }
+    },
+    "NAVIGATION": {
+      "CANCEL": "Abbrechen"
+    },
+    "SEARCH": {
+      "NO_DATA": "Keine Ergebnisse",
+      "IN_PROGRESS": "Suche...",
+      "MESSAGE": {
+        "NO_RESULTS": "Die Suche ergab keine Treffer",
+        "NOK": "Die Suche ist fehlgeschlagen"
+      }
+    },
+    "ACCEPT": {
+      "LABEL": "Annehmen",
+      "HEADER": "Aufgabe annehmen",
+      "TEXT": "Nehmen Sie diese Aufgabe an und führen Sie die Verarbeitung fort.",
+      "MESSAGE": {
+        "OK": "Die Aufgabe wurde erfolgreich angenommen",
+        "NOK": "Ein Fehler ist aufgetreten. Die Aufgabe wurde nicht angenommen."
+      }
+    },
+    "DECLINE": {
+      "LABEL": "Ablehnen",
+      "HEADER": "Aufgabe ablehnen",
+      "TEXT": "Lehnen Sie diese Aufgabe ab und geben Sie sie an den Provider-Workflow zurück.",
+      "MESSAGE": {
+        "OK": "Die Aufgabe wurde erfolgreich abgelehnt",
+        "NOK": "Ein Fehler ist aufgetreten. Die Aufgabe wurde nicht abgelehnt."
+      }
+    },
+    "LOADING": "...wird geladen",
+    "DESCRIPTION": "Beschreibung",
+    "CUSTOM_INPUT": {
+      "ADD": "Eingabe hinzufügen",
+      "REMOVE": "Eingabe entfernen"
+    }
+  },
+  "DIALOG": {
+    "SEARCH": {
+      "HEADER": "Aufgaben",
+      "SUBHEADER": "Aufgaben suchen und verwalten",
+      "SEARCH_TOOLTIP": "Aufgaben anhand der angegebenen Kriterien suchen"
+    },
+    "DATAVIEW": {
+      "FILTER_BY": "Filter für ",
+      "FILTER_CLEAR": "Filter entfernen",
+      "FILTER_PLACEHOLDER": "Filter"
+    }
+  },
+  "TASK_ITEM": {
+    "TITLE": "Titel",
+    "PROVIDER_TASK_ID": "Provider-Aufgaben-ID",
+    "CUSTOM_INPUT": "Benutzerdefinierte Eingaben",
+    "CUSTOM_INPUT_KEY": "Schlüssel",
+    "CUSTOM_INPUT_VALUE": "Wert",
+    "STATUS": "Status",
+    "PROVIDER_TYPE": "Provider-Typ",
+    "TOOLTIPS": {
+      "TITLE": "Aufgabentitel",
+      "PROVIDER_TASK_ID": "Provider-Aufgabenkennung",
+      "STATUS": "Aktueller Aufgabenstatus",
+      "PROVIDER_TYPE": "Typ des Aufgaben-Providers"
+    }
+  },
+  "EXCEPTIONS": {
+    "HTTP_STATUS_undefined": {
+      "TASK_ITEM": "Unbekanntes Problem beim Abrufen von Aufgaben - bitte versuchen Sie es noch einmal."
+    },
+    "HTTP_STATUS_0": {
+      "TASK_ITEM": "Unbekanntes Problem beim Abrufen von Aufgaben - bitte versuchen Sie es noch einmal."
+    },
+    "HTTP_STATUS_400": {
+      "TASK_ITEM": "Ihre Anfrage konnte nicht bearbeitet werden."
+    },
+    "HTTP_STATUS_401": {
+      "TASK_ITEM": "Sie sind nicht berechtigt, Aufgaben anzuzeigen."
+    },
+    "HTTP_STATUS_403": {
+      "TASK_ITEM": "Sie haben keine Rechte, um Aufgaben anzuzeigen."
+    },
+    "HTTP_STATUS_404": {
+      "TASK_ITEM": "Es konnten keine Aufgaben gefunden werden."
+    },
+    "HTTP_STATUS_500": {
+      "TASK_ITEM": "Unbekanntes Server-Problem beim Abrufen von Aufgabendaten - bitte versuchen Sie es noch einmal."
+    }
+  }
+}

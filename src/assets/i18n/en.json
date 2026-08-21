@@ -1,0 +1,102 @@
+{
+  "PAGE_TASK_SEARCH": "Task Search",
+  "ACTIONS": {
+    "LABEL": "Actions",
+    "TOOLTIP": "Actions for the data of the table row",
+    "DELETE": {
+      "LABEL": "Delete",
+      "HEADER": "Delete Task",
+      "TEXT": "Do you want to delete the task with this provider task ID?",
+      "NO_UNDO": "This action cannot be undone!",
+      "MESSAGE": {
+        "OK": "The task was deleted successfully",
+        "NOK": "An error has occurred. The task was not deleted."
+      }
+    },
+    "NAVIGATION": {
+      "CANCEL": "Cancel"
+    },
+    "SEARCH": {
+      "NO_DATA": "No data",
+      "IN_PROGRESS": "Searching...",
+      "MESSAGE": {
+        "NO_RESULTS": "Search returned no results",
+        "NOK": "Search failed"
+      }
+    },
+    "ACCEPT": {
+      "LABEL": "Accept",
+      "HEADER": "Accept Task",
+      "TEXT": "Accept this task and continue with processing.",
+      "MESSAGE": {
+        "OK": "The task was accepted successfully",
+        "NOK": "An error has occurred. The task was not accepted."
+      }
+    },
+    "DECLINE": {
+      "LABEL": "Decline",
+      "HEADER": "Decline Task",
+      "TEXT": "Decline this task and return it to the provider workflow.",
+      "MESSAGE": {
+        "OK": "The task was declined successfully",
+        "NOK": "An error has occurred. The task was not declined."
+      }
+    },
+    "LOADING": "...is loading",
+    "DESCRIPTION": "Description",
+    "CUSTOM_INPUT": {
+      "ADD": "Add input",
+      "REMOVE": "Remove input"
+    }
+  },
+  "DIALOG": {
+    "SEARCH": {
+      "HEADER": "Human Tasks",
+      "SUBHEADER": "Search and manage human tasks",
+      "SEARCH_TOOLTIP": "Search for tasks with given criteria"
+    },
+    "DATAVIEW": {
+      "FILTER_BY": "Filter by ",
+      "FILTER_CLEAR": "Clear Filter",
+      "FILTER_PLACEHOLDER": "Filter"
+    }
+  },
+  "TASK_ITEM": {
+    "TITLE": "Title",
+    "PROVIDER_TASK_ID": "Provider Task ID",
+    "CUSTOM_INPUT": "Custom Input",
+    "CUSTOM_INPUT_KEY": "Key",
+    "CUSTOM_INPUT_VALUE": "Value",
+    "STATUS": "Status",
+    "PROVIDER_TYPE": "Provider Type",
+    "TOOLTIPS": {
+      "TITLE": "Task title",
+      "PROVIDER_TASK_ID": "Provider task identifier",
+      "STATUS": "Current task status",
+      "PROVIDER_TYPE": "Task provider type"
+    }
+  },
+  "EXCEPTIONS": {
+    "HTTP_STATUS_undefined": {
+      "TASK_ITEM": "Unknown problem retrieving task data - please try again."
+    },
+    "HTTP_STATUS_0": {
+      "TASK_ITEM": "Unknown problem retrieving task data - please try again."
+    },
+    "HTTP_STATUS_400": {
+      "TASK_ITEM": "Your request could not be processed."
+    },
+    "HTTP_STATUS_401": {
+      "TASK_ITEM": "You are not authorized to view tasks."
+    },
+    "HTTP_STATUS_403": {
+      "TASK_ITEM": "You do not have permission to view tasks."
+    },
+    "HTTP_STATUS_404": {
+      "TASK_ITEM": "No tasks could be found."
+    },
+    "HTTP_STATUS_500": {
+      "TASK_ITEM": "Unknown server problem retrieving task data - please try again."
+    }
+  }
+}
