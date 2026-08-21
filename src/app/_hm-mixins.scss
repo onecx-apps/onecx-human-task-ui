@@ -1,0 +1,571 @@
+/* **********************************************
+ *  FORM - Control Improvements
+ * **********************************************/
+
+// Manipulate PrimeNG p-floatlabel
+@mixin ocx-p-floatlabel {
+  .p-floatlabel {
+    // Move the label only if embedded input control (input, textarea etc.) is filled or focussed
+    &.p-floatlabel-over {
+      &:has(.p-filled) label,
+      &:has(.p-focus) label {
+        top: -5px !important;
+        background-color: white;
+        padding: 0 0.5rem;
+      }
+    }
+  }
+}
+
+@mixin ocx-required-label {
+  // Keep a visible required marker even when external theme styles are missing.
+  .p-floatlabel > label.ocx-required-label::after {
+    content: ' *';
+    color: var(--red-500, #ef4444);
+    font-weight: 600;
+  }
+}
+
+@mixin ocx-text-responsive {
+  :host ::ng-deep {
+    --disabled-opacity: 0.7;
+    .text-responsive {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+  }
+}
+
+@mixin displaying-text-ellipsis($lines: 1) {
+  text-overflow: ellipsis;
+  overflow: hidden;
+  @if ($lines > 1) {
+    display: -webkit-box;
+    -webkit-line-clamp: $lines;
+    -webkit-box-orient: vertical;
+  } @else {
+    white-space: nowrap;
+  }
+}
+
+@mixin invisible {
+  :host ::ng-deep {
+    .invisible {
+      visibility: hidden;
+    }
+  }
+}
+
+@mixin word-break-all {
+  :host ::ng-deep {
+    .word-break-all {
+      word-break: break-all;
+    }
+  }
+}
+
+// highlight
+@mixin danger-action {
+  :host ::ng-deep {
+    .danger-action-text {
+      color: var(--danger-button-bg);
+    }
+    .danger-action-bg {
+      color: white;
+      background-color: var(--danger-button-bg);
+    }
+  }
+}
+
+@mixin ocx-p-inputgroup {
+  :host ::ng-deep {
+    .p-inputgroupaddon {
+      > p-button {
+        display: flex;
+        height: 100%;
+        width: 100%;
+        > .p-button {
+          flex-grow: 1;
+        }
+      }
+      /* Manipulate the addon wrapper depends on button state inside */
+      &:has(.p-button.p-button-primary) {
+        border: none;
+      }
+    }
+  }
+}
+
+/* **********************************************
+ *  Badges
+ * **********************************************/
+@mixin text-badges {
+  :host ::ng-deep {
+    .text-badge-right {
+      display: inline-block;
+      position: absolute;
+      right: 20px;
+      top: -10px;
+    }
+  }
+}
+@mixin card-badges {
+  :host ::ng-deep {
+    .card-badge-right {
+      display: inline-block;
+      position: absolute;
+      right: 3px;
+      &.badge-1 {
+        top: 3px;
+      }
+      &.badge-2 {
+        top: 35px;
+      }
+    }
+    .card-badge-left {
+      display: inline-block;
+      position: absolute;
+      left: 3px;
+      &.badge-1 {
+        top: 3px;
+      }
+      &.badge-2 {
+        top: 35px;
+      }
+    }
+    .pseudo-button-link {
+      border-radius: var(--border-radius);
+      &:hover {
+        color: var(--primary-color-text);
+        background: var(--button-hover-bg);
+        cursor: pointer;
+        padding: 5px !important;
+      }
+    }
+  }
+}
+
+/* **********************************************
+ *  PrimeNG - Layout Corrections
+ * **********************************************/
+@mixin correct-autocomplete {
+  :host ::ng-deep {
+    .p-autocomplete-panel .p-autocomplete-items .p-autocomplete-item {
+      padding-top: 0.4rem;
+      padding-bottom: 0.4rem;
+      &:nth-child(even) {
+        background-color: var(--table-body-row-even-bg);
+      }
+    }
+    .p-autocomplete-clear-icon {
+      /* fix for bug in PrimeNG */
+      right: 3.5rem;
+    }
+    .p-autocomplete .p-autocomplete-loader {
+      /* fix for bug in PrimeNG */
+      display: none;
+    }
+    .p-autocomplete-input.p-inputtext.p-autocomplete-dd-input {
+      border-bottom-right-radius: unset;
+      border-top-right-radius: unset;
+    }
+    .p-autocomplete-dropdown.p-button-icon-only.p-button {
+      border-bottom-left-radius: unset;
+      border-top-left-radius: unset;
+    }
+  }
+}
+
+// File Upload
+@mixin correct-file-upload {
+  :host ::ng-deep {
+    .p-fileupload {
+      .p-fileupload-buttonbar,
+      .p-fileupload-content {
+        background-color: var(--surface-100) !important;
+      }
+      .p-fileupload-content {
+        padding: 0.5rem;
+        .p-fileupload-row {
+          display: flex;
+          flex-wrap: wrap;
+          justify-content: space-between;
+          gap: 0;
+          > div {
+            width: unset;
+            &.p-fileupload-filename {
+              max-width: 25rem;
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+@mixin correct-select-button {
+  :host ::ng-deep {
+    .p-selectbutton.p-buttonset {
+      .p-button:first-of-type:not(:only-of-type) {
+        border-top-right-radius: 0;
+        border-bottom-right-radius: 0;
+      }
+      .p-button:not(:last-child),
+      .p-button:not(:last-child):hover {
+        border-right: 0 none;
+      }
+      .p-button:last-of-type:not(:only-of-type) {
+        border-top-left-radius: 0;
+        border-bottom-left-radius: 0;
+      }
+      .p-button:not(:first-of-type):not(:last-of-type) {
+        border-radius: 0;
+      }
+    }
+  }
+}
+
+/* **********************************************
+ *  OCX Widgets
+ * **********************************************/
+@mixin ocx-interactive-data-view-fixes {
+  :host ::ng-deep {
+    /* fix base layout of interactive data view */
+    ocx-interactive-data-view > {
+      :first-child {
+        padding-top: 0 !important;
+      }
+      :not(:first-child) {
+        padding: 0.5rem 0 0 0 !important;
+      }
+    }
+    /* correct header layouting by lib */
+    .table-header-wrapper {
+      flex-direction: row !important;
+      justify-content: flex-start !important;
+      flex-wrap: nowrap !important;
+    }
+    .table-header-wrapper span:first-child {
+      margin-right: 10px !important;
+    }
+  }
+}
+
+@mixin ocx-search-criteria-fixes {
+  :host ::ng-deep {
+    .search-criteria-container > div {
+      display: flex;
+      flex-wrap: wrap;
+      align-content: center;
+      row-gap: 1rem;
+      column-gap: 3rem;
+      .search-criteria-buttons {
+        flex-wrap: wrap;
+        align-content: center;
+        margin-top: unset;
+      }
+    }
+  }
+}
+
+@mixin search-criteria-select-button-slim {
+  :host ::ng-deep {
+    .slim-selectbutton {
+      display: flex;
+      flex-wrap: wrap;
+      flex-direction: column;
+      row-gap: 0.1rem;
+      align-items: center;
+
+      .p-selectbutton .p-button {
+        text-align: center;
+        display: inline-block;
+        color: var(--emphasis-medium);
+        font-weight: var(--font-weight);
+        padding: 0.3rem 0.8rem;
+        border: var(--input-border);
+      }
+      .p-selectbutton-subtitle {
+        color: var(--emphasis-medium);
+        font-size: 0.8rem;
+      }
+    }
+  }
+}
+@mixin search-criteria-select-button-filter {
+  :host ::ng-deep {
+    .filter-selectbutton {
+      .p-selectbutton .p-button {
+        opacity: 0.9 !important;
+        border: var(--toggle-button-border);
+        &.p-highlight {
+          background: var(--toggle-button-active-bg);
+          border-color: var(--toggle-button-active-border-color);
+        }
+        &:not(.p-disabled):not(.p-highlight):hover {
+          color: var(--text-color);
+          border-color: var(--toggle-button-hover-border-color);
+          background-color: var(--toggle-button-hover-bg);
+        }
+      }
+    }
+  }
+}
+@mixin search-criteria-select-button {
+  :host ::ng-deep {
+    .p-selectbutton-title {
+      width: 2rem;
+      text-align: right;
+    }
+    .search-criteria-selectbutton {
+      .p-selectbutton .p-button {
+        &.p-highlight {
+          color: var(--primary-text-color);
+          border-color: var(--toggle-button-hover-border-color);
+          background-color: var(--primary-color);
+        }
+        &:not(.p-disabled):not(.p-highlight):hover {
+          color: var(--primary-text-color);
+          border-color: var(--toggle-button-hover-border-color);
+          background-color: var(--button-hover-bg);
+        }
+      }
+    }
+  }
+}
+
+// ZEBRA rows
+@mixin dataview-list-zebra-rows {
+  :host ::ng-deep {
+    .p-dataview-list .p-dataview-content .p-grid > div {
+      &:nth-child(even) {
+        background-color: var(--table-body-row-even-bg);
+      }
+    }
+  }
+}
+@mixin dataview-list-flex-zebra-rows {
+  :host ::ng-deep {
+    .p-dataview-list .p-dataview-content > div {
+      &:nth-child(even) {
+        background-color: var(--table-body-row-even-bg);
+      }
+    }
+  }
+}
+@mixin dropdown-zebra-rows {
+  :host ::ng-deep {
+    .p-dropdown-panel .p-dropdown-items *:nth-child(even) .p-dropdown-item {
+      background-color: var(--table-body-row-even-bg);
+    }
+  }
+}
+@mixin autocomplete-zebra-rows {
+  :host ::ng-deep {
+    .p-autocomplete-list > .p-autocomplete-option:nth-child(even) {
+      background-color: var(--table-body-row-even-bg);
+    }
+  }
+}
+@mixin listbox-zebra-rows {
+  :host ::ng-deep {
+    .p-listbox-list:not(.p-disabled) .p-listbox-option:not(.p-highlight):not(.p-disabled):not(:hover) {
+      &:nth-child(even) {
+        background-color: var(
+          --onecx-help-onecx-help-ui-datatable-row-even-background,
+          var(--table-body-row-even-bg, rgba(0, 0, 0, 0.02))
+        );
+      }
+    }
+  }
+}
+@mixin picklist-zebra-rows {
+  :host ::ng-deep {
+    .p-picklist-list li {
+      &:nth-child(even) {
+        background-color: var(--table-body-row-even-bg);
+      }
+    }
+  }
+}
+@mixin p-table-zebra-rows {
+  :host ::ng-deep {
+    .p-datatable {
+      --table-zebra-even-bg: var(
+        --onecx-help-onecx-help-ui-datatable-row-even-background,
+        var(--table-body-row-even-bg, rgba(0, 0, 0, 0.02))
+      );
+    }
+
+    /* this works only on non-frozen columns (table.p-datatable-striped does not work) */
+    .p-datatable .p-datatable-tbody > tr:nth-child(even) > td:not(.p-frozen-column) {
+      background-color: var(--table-zebra-even-bg);
+    }
+
+    .p-datatable .p-datatable-tbody > tr:nth-child(even) > td:first-child:not(.p-frozen-column) {
+      background-color: var(--table-zebra-first-column-even-bg, var(--table-zebra-even-bg));
+    }
+  }
+}
+
+/* LISTBOX */
+@mixin listbox-layout {
+  :host ::ng-deep {
+    .p-listbox {
+      box-shadow:
+        0 2px 1px -1px rgba(0, 0, 0, 0.2),
+        0 1px 1px 0 rgba(0, 0, 0, 0.14),
+        0 1px 3px 0 rgba(0, 0, 0, 0.12);
+      .p-listbox-list-wrapper {
+        border-radius: var(--border-radius);
+        .p-listbox-list .p-listbox-item {
+          padding: 0.5rem 1rem;
+          .p-checkbox {
+            margin-right: 1rem;
+          }
+        }
+      }
+    }
+  }
+}
+
+// PICKLIST
+@mixin picklist-hide-double-buttons {
+  :host ::ng-deep {
+    .p-picklist .p-picklist-buttons {
+      button[icon='pi pi-angle-double-left'],
+      button[icon='pi pi-angle-double-right'],
+      button:nth-child(2),
+      button:nth-child(4) {
+        display: none !important;
+      }
+    }
+  }
+}
+
+@mixin ocx-p-message {
+  :host ::ng-deep {
+    .p-message {
+      display: inline-grid;
+      min-width: 20rem;
+    }
+  }
+}
+
+/* **********************************************
+ *  DIALOG
+ * **********************************************/
+@mixin ocx-content {
+  :host ::ng-deep {
+    .ocx-content > div {
+      margin-bottom: 0 !important;
+      padding-top: 0.5rem;
+    }
+  }
+}
+
+@mixin ocx-modal-dialog {
+  :host ::ng-deep {
+    .p-dialog .p-dialog-header {
+      padding-top: 1rem;
+      padding-bottom: 1rem;
+    }
+    .p-dialog .p-dialog-content {
+      padding-top: 0.2rem;
+      padding-bottom: 1rem;
+    }
+  }
+}
+@mixin dialog-non-full-size-modal {
+  :host ::ng-deep {
+    @media (max-width: 991px) {
+      .p-dialog.p-dialog {
+        max-height: unset !important;
+        height: unset !important;
+      }
+    }
+    @media (max-width: 576px) {
+      .p-dialog.p-dialog {
+        max-height: inherit !important;
+        height: inherit !important;
+      }
+    }
+  }
+}
+@mixin dialog-footer-buttons {
+  :host ::ng-deep {
+    .p-dialog .p-dialog-footer button {
+      margin: 0;
+    }
+  }
+}
+
+/* **********************************************
+ *  TABs
+ * **********************************************/
+@mixin ocx-tabs {
+  :host ::ng-deep {
+    .p-tabs {
+      .p-tablist {
+        border-bottom: 1px solid var(--surface-300);
+      }
+      .p-tab {
+        padding: 0.75rem 1rem;
+        &.p-tab-active {
+          background-color: rgb(from var(--primary-color) r g b / 0.12);
+        }
+      }
+      .p-tabpanels {
+        padding: 0.5rem 0 0 0;
+      }
+    }
+  }
+}
+
+/* **********************************************
+ *  TABLE
+ * **********************************************/
+@mixin table-inline-p-buttons {
+  :host ::ng-deep {
+    // reduce the size of buttons used inside a table row
+    th button.p-button,
+    td button.p-button {
+      &.p-button-icon-only {
+        padding: 0.5rem;
+        width: unset !important;
+      }
+      &.p-button-rounded {
+        height: unset !important;
+      }
+      &:disabled {
+        opacity: 0.38 !important;
+      }
+    }
+  }
+}
+@mixin table-responsive-table-cell {
+  :host ::ng-deep {
+    // responsive table result view
+    @media screen and (min-width: 576px) {
+      .sm\:table-cell {
+        display: table-cell !important;
+      }
+    }
+    @media screen and (min-width: 768px) {
+      .md\:table-cell {
+        display: table-cell !important;
+      }
+    }
+    @media screen and (min-width: 992px) {
+      .lg\:table-cell {
+        display: table-cell !important;
+      }
+    }
+    @media screen and (min-width: 1200px) {
+      .xl\:table-cell {
+        display: table-cell !important;
+      }
+    }
+  }
+}

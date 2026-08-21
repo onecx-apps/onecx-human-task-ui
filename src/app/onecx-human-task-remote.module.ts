@@ -13,7 +13,7 @@ import {
   provideThemeConfig,
   provideTranslationPathFromMeta
 } from '@onecx/angular-utils'
-import { createAppEntrypoint, initializeRouter } from '@onecx/angular-webcomponents'
+import { createAppEntrypoint, initializeRouter, startsWith } from '@onecx/angular-webcomponents'
 import { AppStateService, ConfigurationService } from '@onecx/angular-integration-interface'
 import { AngularAcceleratorModule } from '@onecx/angular-accelerator'
 
@@ -25,7 +25,12 @@ function apiConfigProvider() {
   return new PortalApiConfiguration(Configuration, environment.apiPrefix)
 }
 
-const routes: Routes = []
+const routes: Routes = [
+  {
+    matcher: startsWith(''),
+    loadChildren: () => import('./human-task/human-task.module').then((m) => m.HumanTaskModule)
+  }
+]
 @NgModule({
   imports: [
     AppEntrypointComponent,

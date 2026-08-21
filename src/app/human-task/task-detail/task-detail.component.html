@@ -1,0 +1,175 @@
+<p-dialog
+  [visible]="displayDialog"
+  (onHide)="onDialogHide()"
+  [modal]="true"
+  [showHeader]="true"
+  [closable]="false"
+  [draggable]="true"
+  [resizable]="true"
+  [style]="{ width: '650px' }"
+  [breakpoints]="{
+    '992px': '60vw',
+    '700px': '80vw',
+    '500px': '96vw'
+  }"
+>
+  <ng-template pTemplate="header">
+    <div class="flex align-items-center justify-content-between w-full">
+      <span class="text-xl font-bold pl-3">{{ getRequestedActionHeaderKey() | translate }}</span>
+      <p-button icon="pi pi-times" [text]="true" [rounded]="true" (onClick)="onDialogHide()"></p-button>
+    </div>
+  </ng-template>
+  @if (loading) {
+    <p-message severity="info" [text]="'ACTIONS.LOADING' | translate"></p-message>
+  } @else if (exceptionKey) {
+    <p-message severity="error" [text]="exceptionKey | translate"></p-message>
+  } @else if (taskData) {
+    <div class="flex flex-column row-gap-1">
+      @if (requestedAction === 'delete') {
+        <div class="px-3 mb-3 font-bold">{{ 'ACTIONS.DELETE.TEXT' | translate }}</div>
+      }
+
+      <section class="surface-section border-round px-3 pb-3 pt-1">
+        <div class="flex flex-column row-gap-3">
+          <div>
+            <div class="text-sm text-color-secondary font-semibold mb-2">{{ 'TASK_ITEM.TITLE' | translate }}</div>
+            <div class="text-base line-height-2">{{ taskData.title || '-' }}</div>
+          </div>
+          <div>
+            <div class="text-sm text-color-secondary font-semibold mb-2">
+              {{ 'TASK_ITEM.PROVIDER_TASK_ID' | translate }}
+            </div>
+            <div class="text-base font-mono text-sm">{{ taskData.providerTaskId || '-' }}</div>
+          </div>
+          <div class="border-top pt-2">
+            <div class="text-sm text-color-secondary font-semibold mb-2">{{ 'ACTIONS.DESCRIPTION' | translate }}</div>
+            <div class="text-base line-height-2">{{ taskData.description || '-' }}</div>
+          </div>
+          <div class="grid grid-cols-12 column-gap-4">
+            <div class="col-12 md:col-6">
+              <div class="text-sm text-color-secondary font-semibold mb-2">{{ 'TASK_ITEM.STATUS' | translate }}</div>
+              <div class="text-base">
+                <p-tag
+                  [value]="taskData.status || '-'"
+                  [severity]="
+                    taskData.status === 'ACCEPTED'
+                      ? 'success'
+                      : taskData.status === 'CREATED'
+                        ? 'info'
+                        : taskData.status === 'DECLINED'
+                          ? 'danger'
+                          : 'warning'
+                  "
+                ></p-tag>
+              </div>
+            </div>
+            <div class="col-12 md:col-6">
+              <div class="text-sm text-color-secondary font-semibold mb-2">
+                {{ 'TASK_ITEM.PROVIDER_TYPE' | translate }}
+              </div>
+              <div class="text-base">{{ taskData.providerType || '-' }}</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      @if (requestedAction === 'delete') {
+        <div class="px-3 font-bold">{{ 'ACTIONS.DELETE.NO_UNDO' | translate }}</div>
+      }
+
+      @if (isInputAction()) {
+        <section class="surface-section border-round p-3">
+          <div class="flex justify-content-between align-items-center mb-2">
+            <div class="text-lg font-bold text-primary">{{ 'TASK_ITEM.CUSTOM_INPUT' | translate }}</div>
+            <p-button
+              id="hm_detail_custom_input_add"
+              icon="pi pi-plus"
+              severity="success"
+              [text]="true"
+              [label]="'ACTIONS.CUSTOM_INPUT.ADD' | translate"
+              (onClick)="addCustomInputEntry()"
+            ></p-button>
+          </div>
+
+          <div class="flex flex-column row-gap-2">
+            @for (entry of customInputEntries; track $index; let index = $index) {
+              <div class="surface-ground border-round p-2 border-1 border-surface-border">
+                <div class="flex flex-column row-gap-2 mb-2">
+                  <div class="flex column-gap-2">
+                    <div class="flex-1">
+                      <label
+                        [for]="'hm_detail_custom_input_key_' + index"
+                        class="text-sm text-color-secondary font-semibold mb-2 block"
+                      >
+                        {{ 'TASK_ITEM.CUSTOM_INPUT_KEY' | translate }}
+                      </label>
+                      <input
+                        #customInputKey
+                        pInputText
+                        class="w-full"
+                        [id]="'hm_detail_custom_input_key_' + index"
+                        [value]="entry.key"
+                        [placeholder]="'TASK_ITEM.CUSTOM_INPUT_KEY' | translate"
+                        (input)="updateCustomInputKey(index, customInputKey.value)"
+                      />
+                    </div>
+                    <div class="flex-1">
+                      <label
+                        [for]="'hm_detail_custom_input_value_' + index"
+                        class="text-sm text-color-secondary font-semibold mb-2 block"
+                      >
+                        {{ 'TASK_ITEM.CUSTOM_INPUT_VALUE' | translate }}
+                      </label>
+                      <input
+                        #customInputValue
+                        pInputText
+                        class="w-full"
+                        [id]="'hm_detail_custom_input_value_' + index"
+                        [value]="entry.value"
+                        [placeholder]="'TASK_ITEM.CUSTOM_INPUT_VALUE' | translate"
+                        (input)="updateCustomInputValue(index, customInputValue.value)"
+                      />
+                    </div>
+                    <div class="flex align-items-end">
+                      <p-button
+                        [id]="'hm_detail_custom_input_remove_' + index"
+                        icon="pi pi-trash"
+                        severity="danger"
+                        [text]="true"
+                        [rounded]="true"
+                        [ariaLabel]="'ACTIONS.CUSTOM_INPUT.REMOVE' | translate"
+                        [pTooltip]="'ACTIONS.CUSTOM_INPUT.REMOVE' | translate"
+                        tooltipPosition="top"
+                        tooltipEvent="hover"
+                        (onClick)="removeCustomInputEntry(index)"
+                      ></p-button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            }
+          </div>
+        </section>
+      }
+    </div>
+  }
+
+  <ng-template pTemplate="footer">
+    <footer class="flex flex-wrap justify-content-end column-gap-2 row-gap-1">
+      <p-button
+        id="hm_detail_action_close"
+        icon="pi pi-times"
+        (onClick)="onDialogHide()"
+        [label]="'ACTIONS.NAVIGATION.CANCEL' | translate"
+      ></p-button>
+      <p-button
+        id="hm_detail_action_execute"
+        [icon]="getRequestedActionButtonIcon()"
+        [severity]="getRequestedActionButtonSeverity()"
+        (onClick)="onRequestedAction()"
+        [disabled]="!taskData"
+        [label]="getRequestedActionButtonLabelKey() | translate"
+      ></p-button>
+    </footer>
+  </ng-template>
+</p-dialog>

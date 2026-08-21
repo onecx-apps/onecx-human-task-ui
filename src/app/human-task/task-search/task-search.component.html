@@ -1,0 +1,181 @@
+<ocx-portal-page permission="TASK#SEARCH" helpArticleId="PAGE_TASK_SEARCH">
+  <app-task-criteria
+    [actions]="(actions$ | async) ?? []"
+    (searchEmitter)="onSearch($event)"
+    (resetSearchEmitter)="onCriteriaReset()"
+  ></app-task-criteria>
+
+  <ocx-content class="ocx-content">
+    @if (exceptionKey) {
+      <p-message id="hm_search_message_error" severity="error" [text]="exceptionKey | translate"></p-message>
+    }
+
+    @let data = data$ | async;
+    @if (data) {
+      @if (searching) {
+        <p-message
+          id="hm_search_message_searching"
+          severity="info"
+          [text]="'ACTIONS.SEARCH.IN_PROGRESS' | translate"
+        ></p-message>
+      } @else {
+        <ocx-interactive-data-view
+          id="hm_search_table"
+          styleClass="p-0"
+          [data]="filteredData ?? data"
+          [supportedViewLayouts]="['table']"
+          [layout]="'table'"
+          [columns]="interactiveColumns"
+          [displayedColumnKeys]="displayedColumnKeys"
+          [clientSideFiltering]="false"
+          [clientSideSorting]="true"
+          [sortField]="sortField"
+          [sortDirection]="sortDirection"
+          [tablePaginator]="true"
+          [pageSize]="10"
+          [pageSizes]="[10, 30, 100]"
+          [emptyResultsMessage]="'ACTIONS.SEARCH.NO_DATA' | translate"
+          (displayedColumnKeysChange)="onColumnsChange($event)"
+          (sorted)="onSortChange($event)"
+        >
+          <ng-template #topCenter>
+            <p-inputgroup>
+              <p-inputgroup-addon>
+                <i class="pi pi-filter"></i>
+              </p-inputgroup-addon>
+              <p-floatlabel variant="on">
+                <input
+                  #globalFilterInput
+                  pInputText
+                  type="text"
+                  id="hm_search_table_global_filter"
+                  [value]="globalFilterValue"
+                  (input)="onGlobalFilter(globalFilterInput.value, data)"
+                  (focus)="globalFilterInput.classList.add('p-focus')"
+                  (blur)="globalFilterInput.classList.remove('p-focus')"
+                  [ariaLabel]="
+                    ('DIALOG.DATAVIEW.FILTER_BY' | translate) +
+                    ('TASK_ITEM.TITLE' | translate) +
+                    ', ' +
+                    ('TASK_ITEM.PROVIDER_TASK_ID' | translate) +
+                    ', ' +
+                    ('ACTIONS.DESCRIPTION' | translate)
+                  "
+                  [pTooltip]="
+                    ('DIALOG.DATAVIEW.FILTER_BY' | translate) +
+                    ('TASK_ITEM.TITLE' | translate) +
+                    ', ' +
+                    ('TASK_ITEM.PROVIDER_TASK_ID' | translate) +
+                    ', ' +
+                    ('ACTIONS.DESCRIPTION' | translate)
+                  "
+                  tooltipPosition="top"
+                  tooltipEvent="hover"
+                />
+                <label for="hm_search_table_global_filter" aria-hidden="true">
+                  {{ 'DIALOG.DATAVIEW.FILTER_PLACEHOLDER' | translate }}
+                </label>
+              </p-floatlabel>
+              <p-inputgroup-addon>
+                <p-button
+                  id="hm_search_table_global_filter_clear"
+                  icon="pi pi-filter-slash"
+                  (onClick)="onClearGlobalFilter(globalFilterInput)"
+                  (onKeydown.enter)="onClearGlobalFilter(globalFilterInput)"
+                  [severity]="globalFilterInput.value !== '' ? 'primary' : 'secondary'"
+                  [disabled]="!globalFilterValue"
+                  [ariaLabel]="'DIALOG.DATAVIEW.FILTER_CLEAR' | translate"
+                  [pTooltip]="'DIALOG.DATAVIEW.FILTER_CLEAR' | translate"
+                  tooltipPosition="top"
+                  tooltipEvent="hover"
+                />
+              </p-inputgroup-addon>
+            </p-inputgroup>
+          </ng-template>
+
+          <ng-template
+            pTemplate="columnHeader"
+            let-col="column"
+            let-labelTemplate="labelTemplate"
+            let-sortTemplate="sortTemplate"
+            let-filterTemplate="filterTemplate"
+          >
+            <div [class]="col.cssHeader">
+              <ng-container
+                [ngTemplateOutlet]="labelTemplate"
+                [ngTemplateOutletContext]="{ column: col }"
+              ></ng-container>
+              <ng-container
+                [ngTemplateOutlet]="filterTemplate"
+                [ngTemplateOutletContext]="{ column: col }"
+              ></ng-container>
+              <ng-container
+                [ngTemplateOutlet]="sortTemplate"
+                [ngTemplateOutletContext]="{ column: col }"
+              ></ng-container>
+            </div>
+          </ng-template>
+
+          <ng-template pTemplate="tableCell" let-item="rowObject" let-col="column">
+            @if (col.id === 'taskActions') {
+              <div class="icon-button-row-wrapper">
+                <p-button
+                  [id]="'hm_search_action_accept_' + (item['id'] ?? '')"
+                  icon="pi pi-check text-green-600"
+                  [rounded]="true"
+                  [text]="true"
+                  [ariaLabel]="'ACTIONS.ACCEPT.LABEL' | translate"
+                  [pTooltip]="'ACTIONS.ACCEPT.LABEL' | translate"
+                  tooltipPosition="top"
+                  tooltipEvent="hover"
+                  (onClick)="onAcceptFromInteractive(item)"
+                ></p-button>
+                <p-button
+                  [id]="'hm_search_action_decline_' + (item['id'] ?? '')"
+                  icon="pi pi-times text-red-600"
+                  [rounded]="true"
+                  [text]="true"
+                  [ariaLabel]="'ACTIONS.DECLINE.LABEL' | translate"
+                  [pTooltip]="'ACTIONS.DECLINE.LABEL' | translate"
+                  tooltipPosition="top"
+                  tooltipEvent="hover"
+                  (onClick)="onDeclineFromInteractive(item)"
+                ></p-button>
+                <p-button
+                  [id]="'hm_search_action_delete_' + (item['id'] ?? '')"
+                  icon="pi pi-trash"
+                  [rounded]="true"
+                  [text]="true"
+                  severity="danger"
+                  [ariaLabel]="'ACTIONS.DELETE.LABEL' | translate"
+                  [pTooltip]="'ACTIONS.DELETE.LABEL' | translate"
+                  tooltipPosition="top"
+                  tooltipEvent="hover"
+                  (onClick)="onDeleteFromInteractive(item)"
+                ></p-button>
+              </div>
+            } @else {
+              @let colBodyCss = col.cssBody ?? '';
+              @let cellText = item[col.id];
+              <div
+                [class]="colBodyCss + ' text-ellipsis-2-lines word-break-all'"
+                [pTooltip]="cellText"
+                tooltipPosition="top"
+                tooltipEvent="hover"
+              >
+                {{ cellText }}
+              </div>
+            }
+          </ng-template>
+        </ocx-interactive-data-view>
+      }
+    }
+  </ocx-content>
+
+  <app-task-detail
+    [displayDialog]="displayDetailDialog"
+    (hideDialogAndChanged)="onCloseDetail($event)"
+    [taskItem]="item4Detail"
+    [requestedAction]="requestedAction4Detail"
+  ></app-task-detail>
+</ocx-portal-page>

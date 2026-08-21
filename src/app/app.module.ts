@@ -13,7 +13,12 @@ import { createTranslateLoader, provideThemeConfig, provideTranslationPathFromMe
 import { environment } from 'src/environments/environment'
 import { AppComponent } from './app.component'
 
-const routes: Routes = []
+const routes: Routes = [
+  {
+    path: '',
+    loadChildren: () => import('./human-task/human-task.module').then((m) => m.HumanTaskModule)
+  }
+]
 @NgModule({
   imports: [
     AppComponent,

@@ -1,0 +1,5 @@
+@use 'src/app/hm-mixins' as *;
+
+@include ocx-search-criteria-fixes;
+@include ocx-text-responsive;
+@include autocomplete-zebra-rows;
