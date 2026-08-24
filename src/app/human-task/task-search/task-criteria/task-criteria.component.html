@@ -1,0 +1,41 @@
+<ocx-search-header
+  [header]="'DIALOG.SEARCH.HEADER' | translate"
+  [subheader]="'DIALOG.SEARCH.SUBHEADER' | translate"
+  (searched)="onSearch()"
+  (resetted)="onResetCriteria()"
+  [manualBreadcrumbs]="false"
+  [actions]="actions"
+>
+  <form [formGroup]="criteriaForm" class="flex flex-wrap gap-3">
+    <p-floatlabel variant="on">
+      <input
+        id="hm_search_criteria_title"
+        pInputText
+        type="text"
+        formControlName="title"
+        class="w-18rem text-responsive"
+        [ariaLabel]="'TASK_ITEM.TOOLTIPS.TITLE' | translate"
+        [pTooltip]="'TASK_ITEM.TOOLTIPS.TITLE' | translate"
+        tooltipPosition="top"
+        tooltipEvent="hover"
+      />
+      <label for="hm_search_criteria_title" aria-hidden="true">{{ 'TASK_ITEM.TITLE' | translate }}</label>
+    </p-floatlabel>
+    <p-floatlabel variant="on">
+      <input
+        id="hm_search_criteria_provider_task_id"
+        pInputText
+        type="text"
+        formControlName="providerTaskId"
+        class="w-18rem text-responsive"
+        [ariaLabel]="'TASK_ITEM.TOOLTIPS.PROVIDER_TASK_ID' | translate"
+        [pTooltip]="'TASK_ITEM.TOOLTIPS.PROVIDER_TASK_ID' | translate"
+        tooltipPosition="top"
+        tooltipEvent="hover"
+      />
+      <label for="hm_search_criteria_provider_task_id" aria-hidden="true">{{
+        'TASK_ITEM.PROVIDER_TASK_ID' | translate
+      }}</label>
+    </p-floatlabel>
+  </form>
+</ocx-search-header>

@@ -1,0 +1,65 @@
+@use '/src/app/hm-mixins.scss' as *;
+
+@include danger-action;
+@include word-break-all;
+@include ocx-text-responsive;
+@include ocx-p-inputgroup;
+@include ocx-p-message;
+@include ocx-interactive-data-view-fixes;
+@include p-table-zebra-rows;
+@include table-inline-p-buttons;
+@include table-responsive-table-cell;
+@include correct-file-upload;
+
+@include dialog-footer-buttons;
+@include dialog-non-full-size-modal;
+
+:host ::ng-deep {
+  .ocx-content > div {
+    margin-bottom: 0 !important;
+  }
+
+  .p-datatable {
+    --table-zebra-first-column-even-bg: inherit;
+
+    .p-datatable-thead > tr > th {
+      border-bottom-width: 2px;
+      &:first-child .table-header-wrapper {
+        justify-content: center !important;
+      }
+    }
+
+    .p-datatable-thead > tr > th,
+    .p-datatable-tbody > tr > td {
+      /* table cell padding is managed by column settings */
+      padding: 0;
+      /* action column */
+      &:first-child {
+        border-right: 1px solid var(--surface-border, #dee2e6);
+        width: 1rem;
+        white-space: nowrap;
+        text-align: center;
+        padding: 0.5rem 1rem;
+      }
+      .icon-button-row-wrapper {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        width: 100%;
+        column-gap: 0rem;
+      }
+    }
+
+    /* action buttons */
+    .p-datatable-thead > tr > th:nth-child(2) {
+      text-align: center;
+    }
+  }
+
+  .max-height-for-2-lines {
+    max-height: 2.5rem;
+  }
+  .text-ellipsis-2-lines {
+    @include displaying-text-ellipsis(2);
+  }
+}
