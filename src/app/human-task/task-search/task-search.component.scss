@@ -59,7 +59,4 @@
   .max-height-for-2-lines {
     max-height: 2.5rem;
   }
-  .text-ellipsis-2-lines {
-    @include displaying-text-ellipsis(2);
-  }
 }

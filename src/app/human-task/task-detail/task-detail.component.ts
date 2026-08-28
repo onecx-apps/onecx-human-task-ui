@@ -4,21 +4,35 @@ import { TranslateModule } from '@ngx-translate/core'
 
 import { ButtonModule } from 'primeng/button'
 import { DialogModule } from 'primeng/dialog'
+import { FloatLabelModule } from 'primeng/floatlabel'
 import { InputTextModule } from 'primeng/inputtext'
 import { MessageModule } from 'primeng/message'
 import { TagModule } from 'primeng/tag'
+import { TextareaModule } from 'primeng/textarea'
 import { TooltipModule } from 'primeng/tooltip'
 
 import { PortalMessageService } from '@onecx/angular-integration-interface'
+import { AngularAcceleratorModule } from '@onecx/angular-accelerator'
 
 import { Task, TasksInternalAPIService } from 'src/app/shared/generated'
 
-export type TaskActionType = 'accept' | 'decline' | 'delete'
+export type TaskActionType = 'accept' | 'decline' | 'delete' | 'view'
 
 @Component({
   selector: 'app-task-detail',
   standalone: true,
-  imports: [ButtonModule, DialogModule, InputTextModule, MessageModule, TagModule, TooltipModule, TranslateModule],
+  imports: [
+    AngularAcceleratorModule,
+    ButtonModule,
+    DialogModule,
+    FloatLabelModule,
+    InputTextModule,
+    MessageModule,
+    TagModule,
+    TextareaModule,
+    TooltipModule,
+    TranslateModule
+  ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './task-detail.component.html',
   styleUrl: './task-detail.component.scss'
@@ -42,6 +56,13 @@ export class TaskDetailComponent implements OnChanges {
     this.exceptionKey = undefined
     this.taskData = undefined
     this.customInputEntries = []
+    if (this.isViewAction() || this.isInputAction()) {
+      this.taskData = this.taskItem
+      if (this.isInputAction()) {
+        this.customInputEntries = [{ key: '', value: '' }]
+      }
+      return
+    }
     this.getData(this.taskItem?.id)
   }
 
@@ -66,8 +87,8 @@ export class TaskDetailComponent implements OnChanges {
       })
       .subscribe({
         next: () => {
-          this.msgService.success({ summaryKey: 'ACTIONS.ACCEPT.MESSAGE.OK' })
           this.onDialogHide(true)
+          this.msgService.success({ summaryKey: 'ACTIONS.ACCEPT.MESSAGE.OK' })
         },
         error: (err) => {
           this.msgService.error({ summaryKey: 'ACTIONS.ACCEPT.MESSAGE.NOK' })
@@ -90,8 +111,8 @@ export class TaskDetailComponent implements OnChanges {
       })
       .subscribe({
         next: () => {
-          this.msgService.success({ summaryKey: 'ACTIONS.DECLINE.MESSAGE.OK' })
           this.onDialogHide(true)
+          this.msgService.success({ summaryKey: 'ACTIONS.DECLINE.MESSAGE.OK' })
         },
         error: (err) => {
           this.msgService.error({ summaryKey: 'ACTIONS.DECLINE.MESSAGE.NOK' })
@@ -126,6 +147,10 @@ export class TaskDetailComponent implements OnChanges {
         this.onDelete()
         break
       }
+      case 'view': {
+        this.onDialogHide()
+        break
+      }
       default: {
         this.onAccept()
       }
@@ -140,22 +165,11 @@ export class TaskDetailComponent implements OnChanges {
       case 'delete': {
         return 'ACTIONS.DELETE.HEADER'
       }
+      case 'view': {
+        return 'ACTIONS.VIEW.HEADER'
+      }
       default: {
         return 'ACTIONS.ACCEPT.HEADER'
-      }
-    }
-  }
-
-  public getRequestedActionTextKey(): string {
-    switch (this.requestedAction) {
-      case 'decline': {
-        return 'ACTIONS.DECLINE.TEXT'
-      }
-      case 'delete': {
-        return 'ACTIONS.DELETE.TEXT'
-      }
-      default: {
-        return 'ACTIONS.ACCEPT.TEXT'
       }
     }
   }
@@ -206,6 +220,42 @@ export class TaskDetailComponent implements OnChanges {
     return this.requestedAction === 'accept' || this.requestedAction === 'decline'
   }
 
+  public isViewAction(): boolean {
+    return this.requestedAction === 'view'
+  }
+
+  public getStatusSeverity(status?: string): 'success' | 'info' | 'danger' | 'warn' {
+    switch (status) {
+      case 'ACCEPTED':
+        return 'success'
+      case 'CREATED':
+        return 'info'
+      case 'DECLINED':
+        return 'danger'
+      default:
+        return 'warn'
+    }
+  }
+
+  public getCustomInputText(): string {
+    const taskData = this.taskData as Record<string, unknown> | undefined
+    if (!taskData) return ''
+
+    const customInputKey = Object.keys(taskData).find((key) => key.toLowerCase() === 'custominput')
+    const customInput = customInputKey ? taskData[customInputKey] : this.getFlattenedCustomInput(taskData)
+    if (customInput === undefined || customInput === null) return ''
+
+    if (typeof customInput === 'string') {
+      try {
+        return JSON.stringify(JSON.parse(customInput), undefined, 2)
+      } catch {
+        return customInput
+      }
+    }
+
+    return JSON.stringify(customInput, undefined, 2)
+  }
+
   public addCustomInputEntry(): void {
     this.customInputEntries = [...this.customInputEntries, { key: '', value: '' }]
   }
@@ -241,6 +291,13 @@ export class TaskDetailComponent implements OnChanges {
     }, {})
   }
 
+  private getFlattenedCustomInput(taskData: Record<string, unknown>): Record<string, unknown> | undefined {
+    const customInputEntries = Object.entries(taskData).filter(([key]) => key.toLowerCase().startsWith('custominput.'))
+    if (customInputEntries.length === 0) return undefined
+
+    return Object.fromEntries(customInputEntries.map(([key, value]) => [key.substring('customInput.'.length), value]))
+  }
+
   private getData(id?: string): void {
     if (!id) return
 
@@ -252,9 +309,6 @@ export class TaskDetailComponent implements OnChanges {
       .subscribe({
         next: (data) => {
           this.taskData = data.resource
-          if (this.isInputAction() && this.customInputEntries.length === 0) {
-            this.customInputEntries = [{ key: '', value: '' }]
-          }
         },
         error: (err) => {
           this.exceptionKey = 'EXCEPTIONS.HTTP_STATUS_' + err.status + '.TASK_ITEM'

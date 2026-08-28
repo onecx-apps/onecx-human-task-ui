@@ -27,7 +27,7 @@
           [layout]="'table'"
           [columns]="interactiveColumns"
           [displayedColumnKeys]="displayedColumnKeys"
-          [clientSideFiltering]="false"
+          [clientSideFiltering]="true"
           [clientSideSorting]="true"
           [sortField]="sortField"
           [sortDirection]="sortDirection"
@@ -101,10 +101,16 @@
             let-filterTemplate="filterTemplate"
           >
             <div [class]="col.cssHeader">
-              <ng-container
-                [ngTemplateOutlet]="labelTemplate"
-                [ngTemplateOutletContext]="{ column: col }"
-              ></ng-container>
+              <span
+                [pTooltip]="col.tooltipKey ? (col.tooltipKey | translate) : ''"
+                tooltipPosition="top"
+                tooltipEvent="hover"
+              >
+                <ng-container
+                  [ngTemplateOutlet]="labelTemplate"
+                  [ngTemplateOutletContext]="{ column: col }"
+                ></ng-container>
+              </span>
               <ng-container
                 [ngTemplateOutlet]="filterTemplate"
                 [ngTemplateOutletContext]="{ column: col }"
@@ -119,28 +125,43 @@
           <ng-template pTemplate="tableCell" let-item="rowObject" let-col="column">
             @if (col.id === 'taskActions') {
               <div class="icon-button-row-wrapper">
-                <p-button
-                  [id]="'hm_search_action_accept_' + (item['id'] ?? '')"
-                  icon="pi pi-check text-green-600"
-                  [rounded]="true"
-                  [text]="true"
-                  [ariaLabel]="'ACTIONS.ACCEPT.LABEL' | translate"
-                  [pTooltip]="'ACTIONS.ACCEPT.LABEL' | translate"
-                  tooltipPosition="top"
-                  tooltipEvent="hover"
-                  (onClick)="onAcceptFromInteractive(item)"
-                ></p-button>
-                <p-button
-                  [id]="'hm_search_action_decline_' + (item['id'] ?? '')"
-                  icon="pi pi-times text-red-600"
-                  [rounded]="true"
-                  [text]="true"
-                  [ariaLabel]="'ACTIONS.DECLINE.LABEL' | translate"
-                  [pTooltip]="'ACTIONS.DECLINE.LABEL' | translate"
-                  tooltipPosition="top"
-                  tooltipEvent="hover"
-                  (onClick)="onDeclineFromInteractive(item)"
-                ></p-button>
+                @if (!isCreatedTask(item)) {
+                  <p-button
+                    [id]="'hm_search_action_view_' + (item['id'] ?? '')"
+                    icon="pi pi-eye"
+                    [rounded]="true"
+                    [text]="true"
+                    [ariaLabel]="'ACTIONS.VIEW.LABEL' | translate"
+                    [pTooltip]="'ACTIONS.VIEW.LABEL' | translate"
+                    tooltipPosition="top"
+                    tooltipEvent="hover"
+                    (onClick)="onViewFromInteractive(item)"
+                  ></p-button>
+                }
+                @if (isCreatedTask(item)) {
+                  <p-button
+                    [id]="'hm_search_action_accept_' + (item['id'] ?? '')"
+                    icon="pi pi-check text-green-600"
+                    [rounded]="true"
+                    [text]="true"
+                    [ariaLabel]="'ACTIONS.ACCEPT.LABEL' | translate"
+                    [pTooltip]="'ACTIONS.ACCEPT.LABEL' | translate"
+                    tooltipPosition="top"
+                    tooltipEvent="hover"
+                    (onClick)="onAcceptFromInteractive(item)"
+                  ></p-button>
+                  <p-button
+                    [id]="'hm_search_action_decline_' + (item['id'] ?? '')"
+                    icon="pi pi-times text-red-600"
+                    [rounded]="true"
+                    [text]="true"
+                    [ariaLabel]="'ACTIONS.DECLINE.LABEL' | translate"
+                    [pTooltip]="'ACTIONS.DECLINE.LABEL' | translate"
+                    tooltipPosition="top"
+                    tooltipEvent="hover"
+                    (onClick)="onDeclineFromInteractive(item)"
+                  ></p-button>
+                }
                 <p-button
                   [id]="'hm_search_action_delete_' + (item['id'] ?? '')"
                   icon="pi pi-trash"
@@ -154,14 +175,18 @@
                   (onClick)="onDeleteFromInteractive(item)"
                 ></p-button>
               </div>
+            } @else if (col.id === 'status') {
+              <div [class]="col.cssBody">
+                <p-tag [value]="item[col.id] ?? '-'" [severity]="getStatusSeverity(item[col.id])"></p-tag>
+              </div>
             } @else {
               @let colBodyCss = col.cssBody ?? '';
               @let cellText = item[col.id];
               <div
-                [class]="colBodyCss + ' text-ellipsis-2-lines word-break-all'"
-                [pTooltip]="cellText"
-                tooltipPosition="top"
-                tooltipEvent="hover"
+                [class]="
+                  colBodyCss +
+                  ' w-full max-height-for-2-lines overflow-hidden text-overflow-ellipsis white-space-normal word-break-all'
+                "
               >
                 {{ cellText }}
               </div>

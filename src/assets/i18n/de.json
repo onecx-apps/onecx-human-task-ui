@@ -6,7 +6,7 @@
     "DELETE": {
       "LABEL": "Löschen",
       "HEADER": "Aufgabe löschen",
-      "TEXT": "Möchten Sie die Aufgabe mit dieser Provider-Aufgaben-ID löschen?",
+      "TEXT": "Möchten Sie diese Aufgabe löschen?",
       "NO_UNDO": "Diese Aktion kann nicht rückgängig gemacht werden!",
       "MESSAGE": {
         "OK": "Die Aufgabe wurde erfolgreich gelöscht",
@@ -15,6 +15,10 @@
     },
     "NAVIGATION": {
       "CANCEL": "Abbrechen"
+    },
+    "VIEW": {
+      "LABEL": "Anzeigen",
+      "HEADER": "Aufgabendetails"
     },
     "SEARCH": {
       "NO_DATA": "Keine Ergebnisse",
