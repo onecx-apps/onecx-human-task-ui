@@ -10,6 +10,7 @@ import { InputGroupAddonModule } from 'primeng/inputgroupaddon'
 import { InputGroupModule } from 'primeng/inputgroup'
 import { InputTextModule } from 'primeng/inputtext'
 import { MessageModule } from 'primeng/message'
+import { TagModule } from 'primeng/tag'
 import { TooltipModule } from 'primeng/tooltip'
 
 import { PortalMessageService, UserService } from '@onecx/angular-integration-interface'
@@ -51,6 +52,7 @@ export type ExtendedColumn = {
     ButtonModule,
     FloatLabelModule,
     MessageModule,
+    TagModule,
     TooltipModule,
     TranslateModule,
     PortalPageComponent,
@@ -133,7 +135,7 @@ export class TaskSearchComponent implements OnInit {
       sortable: true,
       filterable: false,
       cssHeader: 'hidden lg:flex flex-row flex-nowrap align-items-center column-gap-2 px-3 white-space-nowrap',
-      cssBody: 'hidden lg:table-cell py-0 px-3'
+      cssBody: 'hidden lg:block py-0 px-3'
     },
     {
       field: 'status',
@@ -141,7 +143,7 @@ export class TaskSearchComponent implements OnInit {
       labelKey: 'TASK_ITEM.STATUS',
       tooltipKey: 'TASK_ITEM.TOOLTIPS.STATUS',
       sortable: true,
-      filterable: false,
+      filterable: true,
       cssHeader: 'flex flex-row flex-nowrap align-items-center column-gap-2 px-2 sm:px-3 white-space-nowrap',
       cssBody: 'py-0 px-2 sm:px-3'
     },
@@ -151,9 +153,9 @@ export class TaskSearchComponent implements OnInit {
       labelKey: 'TASK_ITEM.PROVIDER_TYPE',
       tooltipKey: 'TASK_ITEM.TOOLTIPS.PROVIDER_TYPE',
       sortable: true,
-      filterable: false,
+      filterable: true,
       cssHeader: 'hidden md:flex flex-row flex-nowrap align-items-center column-gap-2 px-3 white-space-nowrap',
-      cssBody: 'hidden md:table-cell py-0 px-3'
+      cssBody: 'hidden md:block py-0 px-3'
     }
   ]
   public readonly interactiveColumns: DataTableColumn[] = this.createInteractiveColumns()
@@ -205,6 +207,23 @@ export class TaskSearchComponent implements OnInit {
     this.globalFilterValue = ''
     this.filteredData = undefined
     if (input) input.value = ''
+  }
+
+  public isCreatedTask(item: RowListGridData): boolean {
+    return item['status'] === 'CREATED'
+  }
+
+  public getStatusSeverity(status: unknown): 'success' | 'info' | 'danger' | 'warn' {
+    switch (status) {
+      case 'ACCEPTED':
+        return 'success'
+      case 'CREATED':
+        return 'info'
+      case 'DECLINED':
+        return 'danger'
+      default:
+        return 'warn'
+    }
   }
 
   public onSortChange(event: { sortColumn: string; sortDirection: DataSortDirection }): void {
@@ -277,6 +296,10 @@ export class TaskSearchComponent implements OnInit {
 
   public onDeclineFromInteractive(item: RowListGridData): void {
     this.ensureHasPermission('TASK#VIEW', () => this.onDetail(item, 'decline'))
+  }
+
+  public onViewFromInteractive(item: RowListGridData): void {
+    this.ensureHasPermission('TASK#VIEW', () => this.onDetail(item, 'view'))
   }
 
   public onDeleteFromInteractive(item: RowListGridData): void {

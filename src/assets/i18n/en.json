@@ -6,7 +6,7 @@
     "DELETE": {
       "LABEL": "Delete",
       "HEADER": "Delete Task",
-      "TEXT": "Do you want to delete the task with this provider task ID?",
+      "TEXT": "Do you want to delete this task?",
       "NO_UNDO": "This action cannot be undone!",
       "MESSAGE": {
         "OK": "The task was deleted successfully",
@@ -15,6 +15,10 @@
     },
     "NAVIGATION": {
       "CANCEL": "Cancel"
+    },
+    "VIEW": {
+      "LABEL": "View",
+      "HEADER": "Task Details"
     },
     "SEARCH": {
       "NO_DATA": "No data",

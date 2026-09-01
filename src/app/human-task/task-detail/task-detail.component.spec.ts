@@ -79,16 +79,100 @@ describe('TaskDetailComponent', () => {
     expect(component).toBeTruthy()
   })
 
-  it('should load task details when dialog opens with task id', () => {
+  it('should use selected task data without refetching when opening accept mode', () => {
     component.displayDialog = true
     component.taskItem = taskItem
     component.requestedAction = 'accept'
 
     component.ngOnChanges()
 
-    expect(apiServiceSpy.getTaskById).toHaveBeenCalledWith({ id: 'id' })
-    expect(component.taskData?.title).toBe('Task title')
+    expect(apiServiceSpy.getTaskById).not.toHaveBeenCalled()
+    expect(component.taskData).toBe(taskItem)
     expect(component.customInputEntries).toEqual([{ key: '', value: '' }])
+  })
+
+  it('should use selected task data without refetching when opening decline mode', () => {
+    component.displayDialog = true
+    component.taskItem = taskItem
+    component.requestedAction = 'decline'
+
+    component.ngOnChanges()
+
+    expect(apiServiceSpy.getTaskById).not.toHaveBeenCalled()
+    expect(component.taskData).toBe(taskItem)
+    expect(component.customInputEntries).toEqual([{ key: '', value: '' }])
+  })
+
+  it('should use selected task data without refetching when opening view mode', () => {
+    component.displayDialog = true
+    component.taskItem = taskItem
+    component.requestedAction = 'view'
+
+    component.ngOnChanges()
+
+    expect(apiServiceSpy.getTaskById).not.toHaveBeenCalled()
+    expect(component.taskData).toBe(taskItem)
+  })
+
+  it('should return empty custom input text when task data is unavailable', () => {
+    component.taskData = undefined
+
+    expect(component.getCustomInputText()).toBe('')
+  })
+
+  it('should return empty custom input text when task has no custom input', () => {
+    component.taskData = taskItem
+
+    expect(component.getCustomInputText()).toBe('')
+  })
+
+  it('should assign a severity to each task status', () => {
+    expect(component.getStatusSeverity('ACCEPTED')).toBe('success')
+    expect(component.getStatusSeverity('CREATED')).toBe('info')
+    expect(component.getStatusSeverity('DECLINED')).toBe('danger')
+    expect(component.getStatusSeverity('UNKNOWN')).toBe('warn')
+  })
+
+  it('should format persisted custom input as formatted JSON for display', () => {
+    component.taskData = { ...taskItem, customInput: { decision: 'approved', reviewer: 'operations' } }
+
+    expect(component.getCustomInputText()).toBe('{\n  "decision": "approved",\n  "reviewer": "operations"\n}')
+  })
+
+  it('should format persisted custom input when BFF returns it as a JSON string', () => {
+    component.taskData = { ...taskItem, customInput: '{"decision":"approved","reviewer":"operations"}' as any }
+
+    expect(component.getCustomInputText()).toBe('{\n  "decision": "approved",\n  "reviewer": "operations"\n}')
+  })
+
+  it('should display serialized custom input when BFF returns invalid JSON', () => {
+    component.taskData = { ...taskItem, customInput: 'unstructured input' as any }
+
+    expect(component.getCustomInputText()).toBe('unstructured input')
+  })
+
+  it('should return empty custom input text when BFF returns null', () => {
+    component.taskData = { ...taskItem, customInput: null as any }
+
+    expect(component.getCustomInputText()).toBe('')
+  })
+
+  it('should display an empty persisted custom input object as JSON', () => {
+    component.taskData = { ...taskItem, customInput: {} }
+
+    expect(component.getCustomInputText()).toBe('{}')
+  })
+
+  it('should format persisted custom input when BFF uses different property casing', () => {
+    component.taskData = { ...taskItem, CustomInput: { decision: 'approved' } } as Task
+
+    expect(component.getCustomInputText()).toBe('{\n  "decision": "approved"\n}')
+  })
+
+  it('should format persisted custom input when BFF flattens it into task properties', () => {
+    component.taskData = { ...taskItem, 'customInput.ocx-key-1': 'ocx-val1' } as Task
+
+    expect(component.getCustomInputText()).toBe('{\n  "ocx-key-1": "ocx-val1"\n}')
   })
 
   it('should not load task details when dialog is closed', () => {
@@ -103,6 +187,7 @@ describe('TaskDetailComponent', () => {
   it('should not load details when task id is missing', () => {
     component.displayDialog = true
     component.taskItem = { ...taskItem, id: undefined }
+    component.requestedAction = 'delete'
 
     component.ngOnChanges()
 
@@ -115,6 +200,7 @@ describe('TaskDetailComponent', () => {
     spyOn(console, 'error')
     component.displayDialog = true
     component.taskItem = taskItem
+    component.requestedAction = 'delete'
 
     component.ngOnChanges()
 
@@ -126,7 +212,9 @@ describe('TaskDetailComponent', () => {
   it('should accept a task and close dialog on success', () => {
     component.taskData = taskItem
     component.customInputEntries = [{ key: 'decision', value: 'approved' }]
-    const emitSpy = spyOn(component.hideDialogAndChanged, 'emit')
+    const callOrder: string[] = []
+    const emitSpy = spyOn(component.hideDialogAndChanged, 'emit').and.callFake(() => callOrder.push('close'))
+    msgServiceSpy.success.and.callFake(() => callOrder.push('success'))
 
     component.onAccept()
 
@@ -139,12 +227,15 @@ describe('TaskDetailComponent', () => {
     })
     expect(msgServiceSpy.success).toHaveBeenCalledWith({ summaryKey: 'ACTIONS.ACCEPT.MESSAGE.OK' })
     expect(emitSpy).toHaveBeenCalledWith(true)
+    expect(callOrder).toEqual(['close', 'success'])
   })
 
   it('should decline a task and close dialog on success', () => {
     component.taskData = taskItem
     component.customInputEntries = [{ key: 'reason', value: 'missing-documents' }]
-    const emitSpy = spyOn(component.hideDialogAndChanged, 'emit')
+    const callOrder: string[] = []
+    const emitSpy = spyOn(component.hideDialogAndChanged, 'emit').and.callFake(() => callOrder.push('close'))
+    msgServiceSpy.success.and.callFake(() => callOrder.push('success'))
 
     component.onDecline()
 
@@ -157,6 +248,7 @@ describe('TaskDetailComponent', () => {
     })
     expect(msgServiceSpy.success).toHaveBeenCalledWith({ summaryKey: 'ACTIONS.DECLINE.MESSAGE.OK' })
     expect(emitSpy).toHaveBeenCalledWith(true)
+    expect(callOrder).toEqual(['close', 'success'])
   })
 
   it('should close dialog with false changed flag by default', () => {
@@ -271,6 +363,15 @@ describe('TaskDetailComponent', () => {
     expect(deleteSpy).toHaveBeenCalled()
   })
 
+  it('should close dialog when requested action is view', () => {
+    component.requestedAction = 'view'
+    const closeSpy = spyOn(component, 'onDialogHide')
+
+    component.onRequestedAction()
+
+    expect(closeSpy).toHaveBeenCalled()
+  })
+
   it('should execute accept action when requested action is unknown', () => {
     component.requestedAction = 'accept'
     const acceptSpy = spyOn(component, 'onAccept')
@@ -278,12 +379,6 @@ describe('TaskDetailComponent', () => {
     component.onRequestedAction()
 
     expect(acceptSpy).toHaveBeenCalled()
-  })
-
-  it('should return delete text key when requested action is delete', () => {
-    component.requestedAction = 'delete'
-
-    expect(component.getRequestedActionTextKey()).toBe('ACTIONS.DELETE.TEXT')
   })
 
   it('should return decline header key when requested action is decline', () => {
@@ -315,17 +410,9 @@ describe('TaskDetailComponent', () => {
 
     component.requestedAction = 'delete'
     expect(component.getRequestedActionHeaderKey()).toBe('ACTIONS.DELETE.HEADER')
-  })
 
-  it('should return requested action text key per action', () => {
-    component.requestedAction = 'accept'
-    expect(component.getRequestedActionTextKey()).toBe('ACTIONS.ACCEPT.TEXT')
-
-    component.requestedAction = 'decline'
-    expect(component.getRequestedActionTextKey()).toBe('ACTIONS.DECLINE.TEXT')
-
-    component.requestedAction = 'delete'
-    expect(component.getRequestedActionTextKey()).toBe('ACTIONS.DELETE.TEXT')
+    component.requestedAction = 'view'
+    expect(component.getRequestedActionHeaderKey()).toBe('ACTIONS.VIEW.HEADER')
   })
 
   it('should return requested action button label key per action', () => {
@@ -356,6 +443,12 @@ describe('TaskDetailComponent', () => {
     expect(component.isInputAction()).toBeFalse()
   })
 
+  it('should identify view action correctly', () => {
+    component.requestedAction = 'view'
+
+    expect(component.isViewAction()).toBeTrue()
+  })
+
   it('should add and remove custom input entries', () => {
     component.customInputEntries = []
 
@@ -368,26 +461,6 @@ describe('TaskDetailComponent', () => {
     expect(component.customInputEntries).toEqual([{ key: 'k1', value: 'v1' }])
   })
 
-  it('should initialize one blank custom input entry for accept action after loading task data', () => {
-    apiServiceSpy.getTaskById.and.returnValue(
-      of({
-        resource: {
-          ...taskItem,
-          customInput: {
-            decision: 'approve'
-          }
-        }
-      } as GetTaskResponse)
-    )
-    component.displayDialog = true
-    component.requestedAction = 'accept'
-    component.taskItem = taskItem
-
-    component.ngOnChanges()
-
-    expect(component.customInputEntries).toEqual([{ key: '', value: '' }])
-  })
-
   it('should not append blank custom input entry for delete action', () => {
     component.displayDialog = true
     component.requestedAction = 'delete'
@@ -396,6 +469,31 @@ describe('TaskDetailComponent', () => {
     component.ngOnChanges()
 
     expect(component.customInputEntries).toEqual([])
+  })
+
+  it('should load task data when opening delete action', () => {
+    component.displayDialog = true
+    component.requestedAction = 'delete'
+    component.taskItem = taskItem
+
+    component.ngOnChanges()
+
+    expect(component.taskData?.title).toBe('Task title')
+  })
+
+  it('should omit custom input when accepting with no entries', () => {
+    component.taskData = taskItem
+    component.customInputEntries = []
+
+    component.onAccept()
+
+    expect(apiServiceSpy.acceptTask).toHaveBeenCalledWith({
+      id: 'id',
+      acceptTaskRequest: {
+        modificationCount: 3,
+        input: undefined
+      }
+    })
   })
 
   it('should trim keys and values and drop empty keys in accept payload', () => {

@@ -26,55 +26,114 @@
   } @else if (taskData) {
     <div class="flex flex-column row-gap-1">
       @if (requestedAction === 'delete') {
-        <div class="px-3 mb-3 font-bold">{{ 'ACTIONS.DELETE.TEXT' | translate }}</div>
+        <div class="flex flex-column row-gap-1 px-3 mb-3 font-bold">
+          <div>{{ 'ACTIONS.DELETE.TEXT' | translate }}</div>
+          <div>{{ 'ACTIONS.DELETE.NO_UNDO' | translate }}</div>
+        </div>
       }
 
-      <section class="surface-section border-round px-3 pb-3 pt-1">
-        <div class="flex flex-column row-gap-3">
-          <div>
-            <div class="text-sm text-color-secondary font-semibold mb-2">{{ 'TASK_ITEM.TITLE' | translate }}</div>
-            <div class="text-base line-height-2">{{ taskData.title || '-' }}</div>
-          </div>
-          <div>
-            <div class="text-sm text-color-secondary font-semibold mb-2">
-              {{ 'TASK_ITEM.PROVIDER_TASK_ID' | translate }}
-            </div>
-            <div class="text-base font-mono text-sm">{{ taskData.providerTaskId || '-' }}</div>
-          </div>
-          <div class="border-top pt-2">
-            <div class="text-sm text-color-secondary font-semibold mb-2">{{ 'ACTIONS.DESCRIPTION' | translate }}</div>
-            <div class="text-base line-height-2">{{ taskData.description || '-' }}</div>
-          </div>
-          <div class="grid grid-cols-12 column-gap-4">
+      @if (isViewAction() || requestedAction === 'delete') {
+        <ocx-content styleClass="p-0">
+          <div class="grid p-3 row-gap-4">
             <div class="col-12 md:col-6">
-              <div class="text-sm text-color-secondary font-semibold mb-2">{{ 'TASK_ITEM.STATUS' | translate }}</div>
-              <div class="text-base">
-                <p-tag
-                  [value]="taskData.status || '-'"
-                  [severity]="
-                    taskData.status === 'ACCEPTED'
-                      ? 'success'
-                      : taskData.status === 'CREATED'
-                        ? 'info'
-                        : taskData.status === 'DECLINED'
-                          ? 'danger'
-                          : 'warning'
-                  "
-                ></p-tag>
-              </div>
+              <p-floatlabel variant="on">
+                <input id="hm_detail_view_title" pInputText class="w-full" [value]="taskData.title ?? ''" readonly />
+                <label for="hm_detail_view_title">{{ 'TASK_ITEM.TITLE' | translate }}</label>
+              </p-floatlabel>
             </div>
             <div class="col-12 md:col-6">
+              <p-floatlabel variant="on">
+                <input
+                  id="hm_detail_view_provider_task_id"
+                  pInputText
+                  class="w-full"
+                  [value]="taskData.providerTaskId ?? ''"
+                  readonly
+                />
+                <label for="hm_detail_view_provider_task_id">{{ 'TASK_ITEM.PROVIDER_TASK_ID' | translate }}</label>
+              </p-floatlabel>
+            </div>
+            <div class="col-12 md:col-6">
+              <p-floatlabel variant="on">
+                <input id="hm_detail_view_status" pInputText class="w-full" [value]="taskData.status ?? ''" readonly />
+                <label for="hm_detail_view_status">{{ 'TASK_ITEM.STATUS' | translate }}</label>
+              </p-floatlabel>
+            </div>
+            <div class="col-12 md:col-6">
+              <p-floatlabel variant="on">
+                <input
+                  id="hm_detail_view_provider_type"
+                  pInputText
+                  class="w-full"
+                  [value]="taskData.providerType ?? ''"
+                  readonly
+                />
+                <label for="hm_detail_view_provider_type">{{ 'TASK_ITEM.PROVIDER_TYPE' | translate }}</label>
+              </p-floatlabel>
+            </div>
+            <div class="col-12">
+              <p-floatlabel variant="on">
+                <textarea
+                  id="hm_detail_view_description"
+                  pTextarea
+                  class="w-full"
+                  [value]="taskData.description ?? ''"
+                  [autoResize]="true"
+                  readonly
+                  rows="3"
+                ></textarea>
+                <label for="hm_detail_view_description">{{ 'ACTIONS.DESCRIPTION' | translate }}</label>
+              </p-floatlabel>
+            </div>
+            <div class="col-12">
+              <p-floatlabel variant="on">
+                <textarea
+                  id="hm_detail_view_custom_input"
+                  pTextarea
+                  class="w-full"
+                  [value]="getCustomInputText()"
+                  [autoResize]="true"
+                  readonly
+                  rows="2"
+                ></textarea>
+                <label for="hm_detail_view_custom_input">{{ 'TASK_ITEM.CUSTOM_INPUT' | translate }}</label>
+              </p-floatlabel>
+            </div>
+          </div>
+        </ocx-content>
+      } @else {
+        <section class="surface-section border-round px-3 pb-3 pt-1">
+          <div class="flex flex-column row-gap-3">
+            <div>
+              <div class="text-sm text-color-secondary font-semibold mb-2">{{ 'TASK_ITEM.TITLE' | translate }}</div>
+              <div class="text-base line-height-2">{{ taskData.title || '-' }}</div>
+            </div>
+            <div>
               <div class="text-sm text-color-secondary font-semibold mb-2">
-                {{ 'TASK_ITEM.PROVIDER_TYPE' | translate }}
+                {{ 'TASK_ITEM.PROVIDER_TASK_ID' | translate }}
               </div>
-              <div class="text-base">{{ taskData.providerType || '-' }}</div>
+              <div class="text-base font-mono text-sm">{{ taskData.providerTaskId || '-' }}</div>
+            </div>
+            <div class="border-top pt-2">
+              <div class="text-sm text-color-secondary font-semibold mb-2">{{ 'ACTIONS.DESCRIPTION' | translate }}</div>
+              <div class="text-base line-height-2">{{ taskData.description || '-' }}</div>
+            </div>
+            <div class="grid grid-cols-12 column-gap-4">
+              <div class="col-12 md:col-6">
+                <div class="text-sm text-color-secondary font-semibold mb-2">{{ 'TASK_ITEM.STATUS' | translate }}</div>
+                <div class="text-base">
+                  <p-tag [value]="taskData.status || '-'" [severity]="getStatusSeverity(taskData.status)"></p-tag>
+                </div>
+              </div>
+              <div class="col-12 md:col-6">
+                <div class="text-sm text-color-secondary font-semibold mb-2">
+                  {{ 'TASK_ITEM.PROVIDER_TYPE' | translate }}
+                </div>
+                <div class="text-base">{{ taskData.providerType || '-' }}</div>
+              </div>
             </div>
           </div>
-        </div>
-      </section>
-
-      @if (requestedAction === 'delete') {
-        <div class="px-3 font-bold">{{ 'ACTIONS.DELETE.NO_UNDO' | translate }}</div>
+        </section>
       }
 
       @if (isInputAction()) {
@@ -162,14 +221,16 @@
         (onClick)="onDialogHide()"
         [label]="'ACTIONS.NAVIGATION.CANCEL' | translate"
       ></p-button>
-      <p-button
-        id="hm_detail_action_execute"
-        [icon]="getRequestedActionButtonIcon()"
-        [severity]="getRequestedActionButtonSeverity()"
-        (onClick)="onRequestedAction()"
-        [disabled]="!taskData"
-        [label]="getRequestedActionButtonLabelKey() | translate"
-      ></p-button>
+      @if (!isViewAction()) {
+        <p-button
+          id="hm_detail_action_execute"
+          [icon]="getRequestedActionButtonIcon()"
+          [severity]="getRequestedActionButtonSeverity()"
+          (onClick)="onRequestedAction()"
+          [disabled]="!taskData"
+          [label]="getRequestedActionButtonLabelKey() | translate"
+        ></p-button>
+      }
     </footer>
   </ng-template>
 </p-dialog>

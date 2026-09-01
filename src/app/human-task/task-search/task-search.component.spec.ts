@@ -189,6 +189,12 @@ describe('TaskSearchComponent', () => {
     expect(component.displayedColumnKeys).toEqual(newColumns)
   })
 
+  it('should only enable column filters for task status and provider type', () => {
+    const filterableColumns = component.interactiveColumns.filter((column) => column.filterable)
+
+    expect(filterableColumns.map((column) => column.id)).toEqual(['status', 'providerType'])
+  })
+
   it('should open detail dialog when user has view permission', async () => {
     userServiceSpy.hasPermission.and.returnValue(Promise.resolve(true))
 
@@ -209,6 +215,32 @@ describe('TaskSearchComponent', () => {
     expect(component.displayDetailDialog).toBeTrue()
     expect(component.item4Detail?.id).toBe('id2')
     expect(component.requestedAction4Detail).toBe('decline')
+  })
+
+  it('should open detail dialog for view when user has view permission', async () => {
+    userServiceSpy.hasPermission.and.returnValue(Promise.resolve(true))
+
+    component.onViewFromInteractive(rowItem2)
+    await fixture.whenStable()
+
+    expect(component.displayDetailDialog).toBeTrue()
+    expect(component.item4Detail?.id).toBe('id2')
+    expect(component.requestedAction4Detail).toBe('view')
+  })
+
+  it('should identify a created task', () => {
+    expect(component.isCreatedTask(rowItem1)).toBeTrue()
+  })
+
+  it('should not identify a non-created task as created', () => {
+    expect(component.isCreatedTask(rowItem2)).toBeFalse()
+  })
+
+  it('should assign a severity to each task status', () => {
+    expect(component.getStatusSeverity('ACCEPTED')).toBe('success')
+    expect(component.getStatusSeverity('CREATED')).toBe('info')
+    expect(component.getStatusSeverity('DECLINED')).toBe('danger')
+    expect(component.getStatusSeverity('UNKNOWN')).toBe('warn')
   })
 
   it('should open delete dialog when user has delete permission', async () => {
