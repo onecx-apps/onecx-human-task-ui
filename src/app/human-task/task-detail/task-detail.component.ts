@@ -59,7 +59,7 @@ export class TaskDetailComponent implements OnChanges {
     if (this.isViewAction() || this.isInputAction()) {
       this.taskData = this.taskItem
       if (this.isInputAction()) {
-        this.customInputEntries = [{ key: '', value: '' }]
+        this.customInputEntries = this.buildCustomInputEntriesFromTask(this.taskData)
       }
       return
     }
@@ -289,6 +289,22 @@ export class TaskDetailComponent implements OnChanges {
       acc[entry.key] = entry.value
       return acc
     }, {})
+  }
+
+  private buildCustomInputEntriesFromTask(task: Task | undefined): Array<{ key: string; value: string }> {
+    if (!task) return [{ key: '', value: '' }]
+
+    const taskData = task as Record<string, unknown>
+    const customInputKey = Object.keys(taskData).find((key) => key.toLowerCase() === 'custominput')
+    const customInput = customInputKey ? taskData[customInputKey] : this.getFlattenedCustomInput(taskData)
+
+    if (!customInput || typeof customInput !== 'object') return [{ key: '', value: '' }]
+
+    const entries = Object.entries(customInput as Record<string, unknown>)
+      .filter(([key, value]) => key !== '' && value !== undefined && value !== null)
+      .map(([key, value]) => ({ key, value: String(value) }))
+
+    return entries.length > 0 ? entries : [{ key: '', value: '' }]
   }
 
   private getFlattenedCustomInput(taskData: Record<string, unknown>): Record<string, unknown> | undefined {
