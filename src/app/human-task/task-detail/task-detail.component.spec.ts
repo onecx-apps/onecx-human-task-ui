@@ -569,6 +569,79 @@ describe('TaskDetailComponent', () => {
     expect(component.getRequestedActionButtonSeverity()).toBe('primary')
   })
 
+  it('should pre-populate custom input entries from task data when opening accept mode', () => {
+    component.displayDialog = true
+    component.taskItem = { ...taskItem, customInput: { decision: 'approved', reviewer: 'ops' } }
+    component.requestedAction = 'accept'
+
+    component.ngOnChanges()
+
+    expect(component.customInputEntries).toEqual([
+      { key: 'decision', value: 'approved' },
+      { key: 'reviewer', value: 'ops' }
+    ])
+  })
+
+  it('should pre-populate custom input entries from task data when opening decline mode', () => {
+    component.displayDialog = true
+    component.taskItem = { ...taskItem, customInput: { reason: 'incomplete' } }
+    component.requestedAction = 'decline'
+
+    component.ngOnChanges()
+
+    expect(component.customInputEntries).toEqual([{ key: 'reason', value: 'incomplete' }])
+  })
+
+  it('should pre-populate custom input entries from flattened BFF keys', () => {
+    component.displayDialog = true
+    component.taskItem = { ...taskItem, 'customInput.ocx-key-1': 'ocx-val1' } as Task
+    component.requestedAction = 'accept'
+
+    component.ngOnChanges()
+
+    expect(component.customInputEntries).toEqual([{ key: 'ocx-key-1', value: 'ocx-val1' }])
+  })
+
+  it('should fall back to blank entry when custom input is null', () => {
+    component.displayDialog = true
+    component.taskItem = { ...taskItem, customInput: null as any }
+    component.requestedAction = 'accept'
+
+    component.ngOnChanges()
+
+    expect(component.customInputEntries).toEqual([{ key: '', value: '' }])
+  })
+
+  it('should fall back to blank entry when custom input is a string', () => {
+    component.displayDialog = true
+    component.taskItem = { ...taskItem, customInput: 'invalid' as any }
+    component.requestedAction = 'accept'
+
+    component.ngOnChanges()
+
+    expect(component.customInputEntries).toEqual([{ key: '', value: '' }])
+  })
+
+  it('should fall back to blank entry when task item is undefined for input action', () => {
+    component.displayDialog = true
+    component.taskItem = undefined
+    component.requestedAction = 'accept'
+
+    component.ngOnChanges()
+
+    expect(component.customInputEntries).toEqual([{ key: '', value: '' }])
+  })
+
+  it('should fall back to blank entry when custom input has no valid entries', () => {
+    component.displayDialog = true
+    component.taskItem = { ...taskItem, customInput: { '': 'ignored', null: null as any } }
+    component.requestedAction = 'accept'
+
+    component.ngOnChanges()
+
+    expect(component.customInputEntries).toEqual([{ key: '', value: '' }])
+  })
+
   it('should update custom input entry key and value', () => {
     component.customInputEntries = [{ key: '', value: '' }]
 
