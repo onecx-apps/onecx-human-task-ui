@@ -13,5 +13,5 @@ jobs:
     uses: onecx/ci-angular/.github/workflows/build.yml@v1
     secrets: inherit
     with:
-      helmEventTargetRepository: onecx/onecx-human-task
+      helmEventTargetRepository: onecx-apps/onecx-human-task
 
