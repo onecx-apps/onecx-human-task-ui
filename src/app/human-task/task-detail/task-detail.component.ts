@@ -1,4 +1,13 @@
-import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnChanges, Output, inject } from '@angular/core'
+import {
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
+  Component,
+  EventEmitter,
+  Input,
+  OnChanges,
+  Output,
+  inject
+} from '@angular/core'
 import { finalize } from 'rxjs'
 import { TranslateModule } from '@ngx-translate/core'
 
@@ -50,9 +59,11 @@ export class TaskDetailComponent implements OnChanges {
 
   private readonly taskApi = inject(TasksInternalAPIService)
   private readonly msgService = inject(PortalMessageService)
+  private readonly cdr = inject(ChangeDetectorRef)
 
   public ngOnChanges(): void {
     if (!this.displayDialog) return
+    this.loading = false
     this.exceptionKey = undefined
     this.taskData = undefined
     this.customInputEntries = []
@@ -321,7 +332,12 @@ export class TaskDetailComponent implements OnChanges {
     this.exceptionKey = undefined
     this.taskApi
       .getTaskById({ id })
-      .pipe(finalize(() => (this.loading = false)))
+      .pipe(
+        finalize(() => {
+          this.loading = false
+          this.cdr.markForCheck()
+        })
+      )
       .subscribe({
         next: (data) => {
           this.taskData = data.resource
