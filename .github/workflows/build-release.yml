@@ -8,4 +8,4 @@ jobs:
     uses: onecx/ci-angular/.github/workflows/build-release.yml@v1
     secrets: inherit
     with:
-      helmEventTargetRepository: onecx/onecx-human-task
+      helmEventTargetRepository: onecx-apps/onecx-human-task
